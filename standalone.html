@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>迷你模拟消费者调研平台</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ===== 5 Warm Themes ===== */
+body[data-theme="apricot"]{--bg:#fdf8f3;--bg-soft:#faf4ed;--bg-card:#fff;--text-primary:#3e3230;--text-secondary:#6b5d58;--text-muted:#a3968e;--accent:#d4956a;--accent-strong:#c1784a;--accent-soft:#f0d5c0;--accent-dim:#e8c4a8;--border:#ece0d5;--border-light:#f5ede5;--stat-bg:#fdf6f0;--input-bg:#fdf8f4;--input-border:#e8dbcf;--tag-bg:#fdf6f0;--tag-border:#f0d5c0;--shadow:0 1px 3px rgba(80,40,20,.04),0 4px 16px rgba(80,40,20,.04);--shadow-hover:0 1px 3px rgba(80,40,20,.06),0 6px 24px rgba(80,40,20,.06)}
+body[data-theme="peach"]{--bg:#fef5f5;--bg-soft:#fdf0f0;--bg-card:#fff;--text-primary:#3d2e33;--text-secondary:#6b555b;--text-muted:#a38b90;--accent:#d4857b;--accent-strong:#c1706a;--accent-soft:#f2ceca;--accent-dim:#eabfb8;--border:#f0dedb;--border-light:#f8edeb;--stat-bg:#fef7f6;--input-bg:#fef8f7;--input-border:#edd5d2;--tag-bg:#fef7f6;--tag-border:#f2ceca;--shadow:0 1px 3px rgba(80,30,30,.04),0 4px 16px rgba(80,30,30,.04);--shadow-hover:0 1px 3px rgba(80,30,30,.06),0 6px 24px rgba(80,30,30,.06)}
+body[data-theme="oat"]{--bg:#f9f6f1;--bg-soft:#f5f1ea;--bg-card:#fff;--text-primary:#3d3832;--text-secondary:#6b6359;--text-muted:#a3988c;--accent:#c4a882;--accent-strong:#af8f65;--accent-soft:#e8daca;--accent-dim:#dfceb8;--border:#e8e0d4;--border-light:#f2ece4;--stat-bg:#faf7f2;--input-bg:#faf7f3;--input-border:#e5dbcc;--tag-bg:#faf7f2;--tag-border:#e8daca;--shadow:0 1px 3px rgba(60,40,20,.04),0 4px 16px rgba(60,40,20,.04);--shadow-hover:0 1px 3px rgba(60,40,20,.06),0 6px 24px rgba(60,40,20,.06)}
+body[data-theme="amber"]{--bg:#fdf7ef;--bg-soft:#faf2e6;--bg-card:#fff;--text-primary:#3e3328;--text-secondary:#6b5a48;--text-muted:#a3927c;--accent:#d4a35a;--accent-strong:#c18e3e;--accent-soft:#f0dbb8;--accent-dim:#e8cfa0;--border:#ece0c8;--border-light:#f5eddc;--stat-bg:#fdf8f1;--input-bg:#fdf9f2;--input-border:#e8dcc8;--tag-bg:#fdf8f1;--tag-border:#f0dbb8;--shadow:0 1px 3px rgba(80,50,10,.04),0 4px 16px rgba(80,50,10,.04);--shadow-hover:0 1px 3px rgba(80,50,10,.06),0 6px 24px rgba(80,50,10,.06)}
+body[data-theme="rose"]{--bg:#faf4f3;--bg-soft:#f6eeed;--bg-card:#fff;--text-primary:#3d2f30;--text-secondary:#6b5456;--text-muted:#a38a8b;--accent:#c0847c;--accent-strong:#ad6b63;--accent-soft:#ebceca;--accent-dim:#e2bdb8;--border:#eedad7;--border-light:#f6eae8;--stat-bg:#fbf5f4;--input-bg:#fbf6f5;--input-border:#ebd6d3;--tag-bg:#fbf5f4;--tag-border:#ebceca;--shadow:0 1px 3px rgba(80,30,30,.04),0 4px 16px rgba(80,30,30,.04);--shadow-hover:0 1px 3px rgba(80,30,30,.06),0 6px 24px rgba(80,30,30,.06)}
+
+body {
+  --bg:#fdf8f3;--bg-soft:#faf4ed;--bg-card:#fff;--text-primary:#3e3230;--text-secondary:#6b5d58;--text-muted:#a3968e;--accent:#d4956a;--accent-strong:#c1784a;--accent-soft:#f0d5c0;--accent-dim:#e8c4a8;--border:#ece0d5;--border-light:#f5ede5;--stat-bg:#fdf6f0;--input-bg:#fdf8f4;--input-border:#e8dbcf;--tag-bg:#fdf6f0;--tag-border:#f0d5c0;--shadow:0 1px 3px rgba(80,40,20,.04),0 4px 16px rgba(80,40,20,.04);--shadow-hover:0 1px 3px rgba(80,40,20,.06),0 6px 24px rgba(80,40,20,.06);
+  --radius-sm:8px;--radius:14px;--radius-lg:20px;--transition:0.25s cubic-bezier(0.4,0,0.2,1);
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);min-height:100vh;color:var(--text-primary);
+  -webkit-font-smoothing:antialiased;line-height:1.6;
+  transition:background var(--transition),color var(--transition);
+}
+
+.container{max-width:680px;margin:0 auto;padding:32px 24px 56px;position:relative;z-index:1}
+
+/* Theme Switcher */
+.theme-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0 12px}
+.theme-bar-label{font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--text-muted);text-transform:uppercase;margin-right:4px}
+.theme-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all var(--transition);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.theme-dot:hover{transform:scale(1.15)}
+.theme-dot.active{border-color:var(--text-primary);box-shadow:0 0 0 3px var(--border)}
+.theme-dot[data-theme="apricot"]{background:linear-gradient(135deg,#fdf8f3,#e8c4a8)}
+.theme-dot[data-theme="peach"]{background:linear-gradient(135deg,#fef5f5,#eabfb8)}
+.theme-dot[data-theme="oat"]{background:linear-gradient(135deg,#f9f6f1,#dfceb8)}
+.theme-dot[data-theme="amber"]{background:linear-gradient(135deg,#fdf7ef,#e8cfa0)}
+.theme-dot[data-theme="rose"]{background:linear-gradient(135deg,#faf4f3,#e2bdb8)}
+
+/* API Key */
+.api-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:0 0 12px;flex-wrap:wrap}
+.api-bar input{padding:6px 12px;border:1px solid var(--border);border-radius:20px;font-size:12px;width:280px;background:var(--input-bg);color:var(--text-primary);outline:none;font-family:inherit}
+.api-bar input:focus{border-color:var(--accent)}
+.api-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px}
+.api-badge.on{background:#e8f5e9;color:#2e7d32}
+.api-badge.off{background:#fff3e0;color:#e65100}
+
+/* Persona Switcher */
+.persona-bar{display:flex;align-items:center;justify-content:center;gap:6px;padding:2px 0 16px;flex-wrap:wrap}
+.persona-bar-label{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-muted);text-transform:uppercase;margin-right:4px}
+.persona-cards{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.persona-card-mini{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;cursor:pointer;background:var(--bg-card);border:1px solid var(--border);transition:all var(--transition);user-select:none}
+.persona-card-mini:hover{border-color:var(--accent-dim);transform:translateY(-1px);box-shadow:var(--shadow)}
+.persona-card-mini.active{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--shadow)}
+.persona-card-avatar{font-size:18px;line-height:1}
+.persona-card-name{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap}
+
+/* Hero */
+.hero{text-align:center;padding:36px 0 32px}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-strong);padding:5px 14px;border:1px solid var(--accent-soft);border-radius:100px;margin-bottom:26px}
+.hero-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent-strong)}
+.hero-avatar{width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,var(--accent-soft),var(--bg-soft));border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:46px;margin:0 auto 18px;box-shadow:var(--shadow)}
+.hero h1{font-size:30px;font-weight:700;letter-spacing:-0.5px;color:var(--text-primary);line-height:1.2}
+.hero .meta{font-size:14px;color:var(--text-secondary);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:14px}
+.hero .meta .sep{color:var(--text-muted);font-weight:300}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);margin:24px 0 0;border-radius:var(--radius);background:var(--stat-bg);border:1px solid var(--border-light);overflow:hidden}
+.stat-item{text-align:center;padding:16px 8px}
+.stat-value{font-size:20px;font-weight:700;color:var(--accent-strong);letter-spacing:-0.3px}
+.stat-label{font-size:11px;color:var(--text-muted);margin-top:2px;font-weight:500;letter-spacing:.04em}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+.tag{font-size:12px;padding:5px 13px;border-radius:100px;background:var(--tag-bg);border:1px solid var(--tag-border);color:var(--text-secondary);transition:all var(--transition);font-weight:500}
+
+/* Cards */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow);margin-bottom:14px;transition:box-shadow var(--transition)}
+.card:hover{box-shadow:var(--shadow-hover)}
+.card-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-label::before{content:'';width:3px;height:13px;border-radius:2px;background:var(--accent)}
+
+/* Input */
+.input-group{display:flex;gap:10px}
+.input-group input{flex:1;padding:13px 18px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:var(--radius);font-size:15px;color:var(--text-primary);outline:none;transition:all var(--transition);font-family:inherit}
+.input-group input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.input-group input::placeholder{color:var(--text-muted)}
+.input-group input.error{border-color:#d97070;box-shadow:0 0 0 3px rgba(217,112,112,.12)}
+.btn{padding:13px 30px;background:var(--accent-strong);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;transition:all var(--transition);white-space:nowrap;font-family:inherit}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.btn:active{transform:translateY(0);filter:brightness(.95)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;filter:none}
+
+.quick-section{margin-top:14px}
+.quick-label{font-size:11px;color:var(--text-muted);font-weight:500;margin-bottom:8px;letter-spacing:.03em}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-size:13px;padding:6px 15px;border-radius:100px;background:var(--tag-bg);border:1px solid var(--tag-border);color:var(--text-secondary);cursor:pointer;transition:all var(--transition);white-space:nowrap;font-weight:500}
+.chip:hover{background:var(--accent-soft);border-color:var(--accent-dim);color:var(--accent-strong)}
+
+/* Conversation */
+.conv-thread{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.msg-pair{animation:fadeIn .35s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg-q{background:var(--bg-soft);border:1px solid var(--border-light);border-radius:var(--radius-lg) var(--radius-lg) var(--radius-sm) var(--radius-lg);padding:13px 18px;font-size:14px;color:var(--text-secondary);font-weight:500;margin-bottom:8px;position:relative}
+.msg-q::before{content:'Q';position:absolute;top:-8px;left:14px;font-size:10px;font-weight:700;color:var(--accent-strong);background:var(--bg-card);padding:0 6px;letter-spacing:.06em}
+.msg-a{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-sm);padding:16px 18px;font-size:15px;line-height:1.85;color:var(--text-primary);position:relative}
+.msg-a::before{content:'A';position:absolute;top:-8px;left:14px;font-size:10px;font-weight:700;color:var(--accent);background:var(--bg-card);padding:0 6px;letter-spacing:.06em}
+
+/* Sentiment */
+.sentiment-badge{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:100px;margin-top:8px}
+.sentiment-badge.s-种草{background:#e8f5e9;color:#2e7d32}
+.sentiment-badge.s-中立{background:#f5f5f5;color:#616161}
+.sentiment-badge.s-吐槽{background:#fce4ec;color:#c62828}
+
+/* Follow-ups */
+.fu-section{margin-top:10px}
+.fu-label{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase}
+.fu-chips{display:flex;flex-wrap:wrap;gap:6px}
+.fu-chip{font-size:12px;padding:6px 14px;border-radius:100px;cursor:pointer;background:var(--accent-soft);border:1px solid var(--accent-dim);color:var(--accent-strong);font-weight:500;transition:all var(--transition);white-space:nowrap}
+.fu-chip:hover{background:var(--accent-dim);border-color:var(--accent-strong)}
+
+/* Tracker */
+.tracker-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-top:4px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tracker-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text-muted);text-transform:uppercase}
+.tracker-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;flex:1;min-width:120px;background:#eee}
+.tracker-seg{transition:width .4s ease}
+.tracker-seg.pos{background:#66bb6a}
+.tracker-seg.neu{background:#bdbdbd}
+.tracker-seg.neg{background:#ef5350}
+.tracker-count{font-size:11px;color:var(--text-muted);font-weight:500}
+
+/* Scenarios */
+.scenario-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.scenario-card{font-size:12px;padding:11px 14px;cursor:pointer;border-radius:var(--radius);background:var(--bg-card);border:1px dashed var(--accent-dim);color:var(--text-secondary);transition:all var(--transition);line-height:1.5;text-align:left}
+.scenario-card:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-strong)}
+.scenario-card .sc-emoji{font-size:16px;margin-right:4px}
+
+.btn-clear{font-size:11px;padding:6px 14px;border-radius:100px;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-muted);transition:all var(--transition);font-family:inherit;font-weight:500;margin-left:auto}
+.btn-clear:hover{border-color:#d97070;color:#d97070;background:rgba(217,112,112,.04)}
+
+.loading-ring{display:flex;align-items:center;justify-content:center;padding:28px 0}
+.loading-ring .ring{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--accent);animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.diag-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:16px 20px;margin-top:14px;box-shadow:var(--shadow)}
+.diag-card summary{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--text-muted);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;user-select:none}
+.diag-card summary::-webkit-details-marker{display:none}
+.diag-card summary::after{content:'展开';font-size:10px;color:var(--accent-dim);margin-left:auto;font-weight:500}
+.diag-card details[open] summary::after{content:'收起'}
+.diag-list{margin-top:12px;display:flex;flex-direction:column;gap:7px}
+.diag-item{font-size:13px;padding:10px 14px;background:var(--bg-soft);border-radius:var(--radius-sm);color:var(--text-secondary);line-height:1.65}
+.diag-item strong{color:var(--accent-strong);font-weight:600}
+.diag-item code{color:var(--accent-strong);background:var(--accent-soft);padding:1px 5px;border-radius:3px;font-size:12px}
+.diag-note{font-size:12px;color:var(--text-muted);margin-top:10px;line-height:1.6}
+.diag-note code{color:var(--accent-dim);background:var(--accent-soft);padding:1px 5px;border-radius:3px}
+.footer{text-align:center;padding:32px 0 0;font-size:11px;color:var(--text-muted);letter-spacing:.04em;font-weight:500}
+
+@media(max-width:560px){.container{padding:20px 16px 40px}.input-group{flex-direction:column}.btn{width:100%;text-align:center}.hero h1{font-size:26px}.hero-avatar{width:80px;height:80px;font-size:38px}.scenario-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-theme="apricot">
+
+<div class="container">
+  <!-- Theme -->
+  <div class="theme-bar">
+    <span class="theme-bar-label">Theme</span>
+    <span class="theme-dot active" data-theme="apricot" data-label="暖杏" onclick="setTheme('apricot')"></span>
+    <span class="theme-dot" data-theme="peach" data-label="蜜桃" onclick="setTheme('peach')"></span>
+    <span class="theme-dot" data-theme="oat" data-label="燕麦" onclick="setTheme('oat')"></span>
+    <span class="theme-dot" data-theme="amber" data-label="琥珀" onclick="setTheme('amber')"></span>
+    <span class="theme-dot" data-theme="rose" data-label="玫瑰" onclick="setTheme('rose')"></span>
+  </div>
+
+  <!-- API mode / Backend status -->
+  <div class="api-bar">
+    <input id="apiKeyInput" type="password" placeholder="可选：填入 Anthropic / DeepSeek API Key" onchange="onApiKeyChange()">
+    <span class="api-badge off" id="apiBadge">Mock</span>
+  </div>
+
+  <!-- Persona -->
+  <div class="persona-bar" id="personaBar"></div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">AI Consumer Simulation</div>
+    <div class="hero-avatar" id="heroAvatar"></div>
+    <h1 id="heroName"></h1>
+    <div class="meta" id="heroMeta"></div>
+    <div class="stat-row" id="heroStats"></div>
+    <div class="tag-row" id="heroTags"></div>
+  </div>
+
+  <!-- Scenarios -->
+  <div id="scenarioSection">
+    <div class="card-label" style="margin-bottom:8px">What-If Scenarios</div>
+    <div class="scenario-grid" id="scenarioGrid"></div>
+  </div>
+
+  <!-- Conversation -->
+  <div class="conv-thread" id="convThread"></div>
+
+  <!-- Input -->
+  <div class="card">
+    <div class="card-label" style="display:flex;align-items:center;justify-content:space-between">
+      <span>Survey Question</span>
+      <button class="btn-clear" id="btnClear" onclick="clearConversation()" style="display:none">Clear All</button>
+    </div>
+    <div class="input-group">
+      <input id="question" type="text" placeholder="输入你想调研的问题..." autocomplete="off" maxlength="200">
+      <button class="btn" id="submitBtn" onclick="submitQuestion()"><span id="btnLabel">提交调研</span></button>
+    </div>
+    <div class="quick-section">
+      <div class="quick-label">Quick Prompts</div>
+      <div class="chips" id="quickChips"></div>
+    </div>
+  </div>
+
+  <!-- Tracker -->
+  <div class="tracker-card" id="trackerCard" style="display:none">
+    <span class="tracker-title">Sentiment</span>
+    <div class="tracker-bar" id="trackerBar"><div class="tracker-seg neu" style="width:100%"></div></div>
+    <span class="tracker-count" id="trackerCount">0 answers</span>
+  </div>
+
+  <div class="diag-card">
+    <details>
+      <summary>Test Cases &amp; Diagnostics</summary>
+      <div class="diag-list">
+        <div class="diag-item"><strong>对话流</strong> — 连续问3个问题，验证追问按钮生成和情感累积</div>
+        <div class="diag-item"><strong>场景测试</strong> — 点击 What-If 场景卡，测试"如果...会怎样"回答</div>
+        <div class="diag-item"><strong>情感追踪</strong> — 底部追踪条实时更新，显示 😊/😐/😠 比例</div>
+      </div>
+    </details>
+  </div>
+
+  <div class="footer">Mini Consumer Survey Platform — Standalone v1</div>
+</div>
+
+<script>
+// ==================== PERSONA DATA ====================
+var PERSONAS = {
+xiaolin:{id:"xiaolin",name:"小琳",avatar:"👩",age:"28岁",city:"杭州",job:"互联网运营",
+stats:[{value:"¥8k",label:"月收入"},{value:"¥1–2k",label:"月护肤支出"},{value:"5×/周",label:"护肤频率"}],
+tags:["成分党","偏好国货+日韩","理性种草","抗初老 & 美白","大促囤货型"],
+quick_prompts:[["你平时怎么挑选美白精华？","美白精华选购"],["你一个月在护肤品上花多少钱？","预算分配策略"],["你对现在流行的国货护肤品牌怎么看？","国货品牌态度"],["你会跟风买小红书推荐的产品吗？","种草与决策"],["618你打算囤哪些护肤品？","大促囤货计划"],["你去过美容院或做过医美吗？","美容院 & 医美"]],
+system_prompt:"你是模拟消费者：小琳/28岁/女/杭州/互联网运营/月入8000/月护肤支出1000-2000。高频护肤，注重性价比，成分党，偏好国货和日韩品牌，大促囤货。第一人称回答，自然真实，100-200字。",
+mock:[
+{keywords:["美白","白","暗沉","肤色","淡斑","色斑"],answer:"美白是我最在意的护肤功课！用了很多产品，觉得烟酰胺+维C组合最有效。目前在用珀莱雅双抗精华（200出头），搭薇诺娜防晒，坚持小半年白了一个度。美白是长期工程，防晒比精华更重要。预算有限的话我会优先买好的防晒。"},
+{keywords:["面膜","补水","保湿"],answer:"面膜一周敷3-4次，片状和涂抹换着来。片状单片超15块就嫌贵，618囤自然堂和珀莱雅平均七八块一片。涂抹式在用科颜氏白泥和芙丽芳丝，挺好用的。"},
+{keywords:["精华","抗老","抗初老","抗衰","皱纹"],answer:"精华是我最舍得花钱的品类，200-400区间。抗初老从25岁开始，关注二裂酵母、玻色因、视黄醇。红宝石精华性价比很高，一百多块成分表能打。小棕瓶好用但太贵，月薪8k下不去手。"},
+{keywords:["品牌","国货","大牌","牌子"],answer:"国货做得很好！化妆台80%是国货和日韩，珀莱雅、薇诺娜、至本、HBN轮着用。成分肤感不输大牌，价格便宜太多。大牌先买小样，好用再等大促入正装。"},
+{keywords:["价格","预算","贵","便宜","消费","花钱","省钱"],answer:"月薪8k在杭州不算宽裕，护肤预算1500已经是比较舍得的部分。精华面霜买好点200-400，水乳洁面选性价比高的100以内，面膜趁大促囤。贵价先买小样再入正装，不踩雷也不心疼。"},
+{keywords:["防晒","清洁","洁面","卸妆","水乳","面霜"],answer:"基础护肤注重实用。洁面用至本氨基酸50多块，水用HABA G露，面霜冬珂润夏薇诺娜。防晒一年四季都涂，碧柔和安耐晒换着用。防晒是最值得投资的护肤品。"},
+{keywords:["购物","渠道","淘宝","京东","小红书","直播","种草"],answer:"基本都在线上买，618双11囤货。先在小红书和抖音看测评，关注成分博主做功课。直播间偶尔蹲但不冲动。线下逛屈臣氏和话梅试色号和质地。"},
+{keywords:["美容院","医美","项目"],answer:"美容院一个月去1-2次做基础清洁补水，一次150-200，预算300-400/月。医美还没尝试，价格偏高也有点怕。朋友做了光子嫩肤说不错，考虑年底发年终奖去试一次。"}],
+fallback:"这个问题挺有意思的。作为经常研究护肤品的人，我觉得还是得看具体需求和成分。预算范围内选最适合自己的才是王道。",
+scenarios:[["如果某大牌（兰蔻）推出200元以内的平价线，你会从国货转投吗？","大牌平价线冲击"],["如果直播间送你一堆小样，你会冲动下单正装吗？","小样诱惑测试"],["如果珀莱雅涨价30%，你还会继续买吗？","国货涨价测试"],["如果闺蜜强烈推荐一个你没听过的品牌，你会买吗？","社交推荐测试"]]
+},
+
+daliu:{id:"daliu",name:"大刘",avatar:"👨‍💻",age:"35岁",city:"深圳",job:"产品经理",
+stats:[{value:"¥25k",label:"月收入"},{value:"¥3–5k",label:"数码/汽车月支出"},{value:"2×/月",label:"户外频率"}],
+tags:["数码控","新能源车主","户外露营党","请客型消费","注重效率"],
+quick_prompts:[["你买手机最看重什么？预算多少？","手机选购观"],["你的新能源车使用体验怎么样？","新能源车体验"],["你周末会去露营吗？装备花了多少？","户外露营消费"],["你和朋友聚餐一般怎么安排？","社交餐饮习惯"],["你最近买的最值的数码产品是什么？","数码好物推荐"],["你觉得男人有必要花钱护肤吗？","男性护肤态度"]],
+system_prompt:"你是模拟消费者：大刘/35岁/男/深圳/产品经理/月入25000。数码重度用户，2024换比亚迪海豹，周末露营徒步，社交请客型消费。第一人称，务实直接，100-200字。",
+mock:[
+{keywords:["手机","数码","耳机","电脑","笔记本","电子产品"],answer:"手机基本一年一换，现在用小米15 Pro。选机主要看屏幕和续航，拍照没那么在意。预算5000-7000比较舒服，超1万溢价太严重。耳机用索尼WH-1000XM5，降噪真的好用，出差必备。"},
+{keywords:["车","新能源","充电","续航","驾驶"],answer:"去年换了比亚迪海豹，落地18万出头。续航标称700实际跑550左右，深圳充电桩多没焦虑。最满意智能驾驶辅助，堵车轻松不少。但车机偶尔卡顿不爽，30万预算可能会选蔚来。"},
+{keywords:["露营","户外","徒步","运动","装备"],answer:"露营装备七七八八花了一万五。帐篷睡袋买了挪客的性价比不错。冲锋衣狠心入了件始祖鸟Beta AR（4000多），确实防风防水但迪卡侬499的也能用。保命的买好的，装饰性的够用就行。"},
+{keywords:["吃饭","聚餐","请客","餐厅","美食","社交"],answer:"朋友聚餐一般我组局，人均200-400正常范围。找有特色的店，不一定是贵的。请客控制在人均300以内，一个月两三次。自己平时比较随便，外卖或楼下快餐半小时搞定。"},
+{keywords:["护肤","保养","形象","打扮"],answer:"男人护肤有必要但不用过度。每天三步：洁面+水+防晒，五分钟搞定。用LAB SERIES一套大概五六百用三四个月。主要诉求干净不油腻，抗老还没太关注。"}],
+fallback:"这个问题我得想一下。我的消费逻辑比较简单：核心体验的东西舍得花钱，周边的够用就行。时间比钱更值钱。",
+scenarios:[["如果苹果手机降价20%，你会从安卓转回iPhone吗？","苹果降价测试"],["如果新能源车补贴取消，你还会买电车吗？","补贴取消测试"],["如果迪卡侬和始祖鸟联名出平价冲锋衣，你会买吗？","联名平价测试"]]
+},
+
+zhangyi:{id:"zhangyi",name:"张姨",avatar:"👩‍🍳",age:"52岁",city:"洛阳",job:"退休教师",
+stats:[{value:"¥5k",label:"月退休金"},{value:"¥800–1.5k",label:"保健品/养生月支出"},{value:"每天",label:"广场舞频率"}],
+tags:["养生达人","广场舞爱好者","疼孙辈","比价能手","抖音重度用户"],
+quick_prompts:[["你平时买什么保健品？觉得有用吗？","保健品消费观"],["你最舍得在哪方面花钱？","消费重心"],["你会给孙子孙女买什么东西？","孙辈消费"],["你买菜一般去哪买？花多少？","生鲜采买习惯"],["你刷抖音会买东西吗？","短视频购物"]],
+system_prompt:"你是模拟消费者：张姨/52岁/女/洛阳/退休教师/月退休金5000。注重养生，广场舞积极，疼孙辈，比价老手，抖音购物新手。第一人称，亲切家常，100-200字。",
+mock:[
+{keywords:["保健","养生","钙片","鱼油","维生素","健康"],answer:"每天早上吃一粒钙片一粒鱼油，女儿在网上买的，说汤臣倍健牌子好。吃了两年多感觉腿脚利索了些。最近又加了辅酶Q10说对心脏好。一个月这些大概三四百，这钱花得值，身体好比什么都强。"},
+{keywords:["广场舞","跳舞","运动","锻炼"],answer:"我们广场舞队二十来号人，我是积极分子！队服买了好几套一套七八十不贵。最贵的是蓝牙音箱，两百多块大家凑的，音量大续航长。跳舞这几年睡眠好了人也开心了，比吃保健品管用！"},
+{keywords:["孙子","孙女","孙辈","小孩","孩子","玩具"],answer:"外孙今年四岁，看到玩具走不动道。一个月给他买一两样控制两百块以内。上次买乐高花了两百多被他妈妈说了太贵了。后来就买些几十块小汽车小恐龙，孩子一样玩得开心。太贵的会先问女儿意见。"},
+{keywords:["买菜","菜市场","超市","生鲜","水果"],answer:"买菜认准早市，七点去最新鲜还便宜。一个月菜钱六七百两个人吃。超市晚上八点后去熟食和生鲜打折。盒马去过两次东西新鲜但太贵，退休工资消费不起。还是菜市场最实惠。"},
+{keywords:["抖音","直播","网购","网上","快递"],answer:"抖音天天刷也买过几次东西。买过一个拖把挺好用，但买过一件毛衣色差太大直接退了。现在学聪明了多看评论特别是差评。贵的东西还是在淘宝买，抖音上就买些小玩意儿。"}],
+fallback:"哎呀这个问题我得好好想想。我们这个年纪的人花钱比较谨慎，毕竟退休金就那么些。但该花的地方也不会太省，健康最重要。",
+scenarios:[["如果保健品买二送一，你会一次囤半年量吗？","囤货测试"],["如果邻居推荐了一个很贵但据说效果很好的按摩仪，你会买吗？","高价推荐测试"],["如果广场舞比赛需要统一买200元的新队服，你会同意吗？","集体消费测试"]]
+},
+
+ajie:{id:"ajie",name:"阿杰",avatar:"👦",age:"22岁",city:"上海",job:"初级程序员",
+stats:[{value:"¥6k",label:"月收入"},{value:"¥1.5k",label:"外卖月支出"},{value:"每周5–6次",label:"点外卖频率"}],
+tags:["外卖达人","手游月卡党","B站重度用户","球鞋关注者","合租省钱党"],
+quick_prompts:[["你一个月外卖花多少钱？","外卖消费习惯"],["你在游戏上花钱吗？","游戏氪金态度"],["你对潮牌球鞋怎么看？","球鞋消费观"],["你租房体验怎么样？","租房与生活成本"],["你最舍得在哪方面花钱？","消费优先级"]],
+system_prompt:"你是模拟消费者：阿杰/22岁/男/上海/初级程序员/月入6000。外卖高频用户，手游月卡党，关注球鞋但预算有限，B站大会员，合租省钱党。第一人称，随性真实，100-200字。",
+mock:[
+{keywords:["外卖","吃饭","点餐","饿了么","美团","吃"],answer:"外卖一周点五六次是常态，加班没时间做饭。最爱炸鸡和麻辣烫，客单价25-40。一个月外卖大概花1500，上海这个消费水平没办法。偶尔领到美团大额券会开心一整天。"},
+{keywords:["游戏","氪金","充值","原神","崩铁","王者","手游"],answer:"原神玩了一年多，月卡30块雷打不动，偶尔遇到喜欢的角色氪个首充198。一个月游戏花100-200，算是为数不多的娱乐消费了。648是不可能648的，月薪6k在上海活下去已经很不容易了。"},
+{keywords:["球鞋","潮牌","衣服","穿搭","鞋"],answer:"球鞋确实喜欢但买不起贵的，最贵一双是双十一抢的Air Force 1六百多。平时穿回力和安踏的平替款，两三百一双也好搭。潮牌就买优衣库和GU干净舒服。等涨工资第一件事入一双AJ。"},
+{keywords:["租房","房租","水电","生活成本"],answer:"房租2500是每月最大的痛，占收入40%还多。在浦东和同事合租一间十几平。电费夏天开空调巨贵。想过搬远一点便宜但通勤太久，每天地铁来回两小时已经是极限了。"},
+{keywords:["B站","大会员","视频","内容","付费","订阅"],answer:"B站大会员连开两年了，一年148还行。还有百度网盘SVIP下载资源刚需。一个月订阅大概五六十。好的内容我愿意付费，但不会为烂内容花一分钱，程序员的坚持。"}],
+fallback:"呃这个问题让我想想。刚毕业嘛，工资在上海真的不够花，每个月基本月光。但我觉得刚工作前两年不用太焦虑存钱，先提升自己比较重要。",
+scenarios:[["如果外卖会员涨价30%，你还会续费吗？","外卖涨价测试"],["如果原神下一个限定角色强度超高，你会破例氪648吗？","游戏氪金测试"],["如果公司搬到更远的地方但房租便宜500，你会搬家吗？","通勤vs房租测试"]]
+},
+
+lily:{id:"lily",name:"Lily",avatar:"💆",age:"30岁",city:"成都",job:"市场经理",
+stats:[{value:"¥18k",label:"月收入"},{value:"¥2–3k",label:"健身/宠物月支出"},{value:"4×/周",label:"健身频率"}],
+tags:["CrossFit爱好者","猫奴一枚","轻奢包包控","咖啡探店达人","悦己型消费"],
+quick_prompts:[["你在健身上花了多少钱？值得吗？","健身消费观"],["你养猫一个月大概花多少？","宠物消费明细"],["你买包会选轻奢还是大牌？","包包消费态度"],["你周末喜欢探什么咖啡店？","探店消费习惯"],["你怎么平衡存钱和悦己消费？","消费与储蓄平衡"]],
+system_prompt:"你是模拟消费者：Lily/30岁/女/成都/市场经理/月入18000。CrossFit爱好者，猫奴，轻奢包爱好者，咖啡探店达人，悦己型消费。第一人称，精致自然，100-200字。",
+mock:[
+{keywords:["健身","运动","私教","CrossFit","锻炼"],answer:"健身是我生活中最固定的支出。CrossFit年卡8000多，再加私教课一个月大概1500。很多人觉得贵但我算了一下除以去的次数其实还好。健身后整个人的状态和自信都不一样了，这钱花得特别值。"},
+{keywords:["猫","宠物","猫粮","猫砂","布偶"],answer:"我家布偶叫年糕，妥妥的四脚吞金兽！每个月猫粮300+猫砂100+保险100，再加零食玩具差不多五六百。上次尿闭去趟宠物医院直接2000+，宠物医保真的很重要。但每天回家它来蹭我的时候觉得一切都值了。"},
+{keywords:["包","包包","轻奢","Coach","Tory Burch","MK"],answer:"包我喜欢轻奢档位的，一年入1-2个。Coach和Tory Burch是我常买的牌子，一个三千到五千，质感不错背出去也体面。大牌LV Gucci一两万的目前还舍不得。等升职加薪再说吧。"},
+{keywords:["咖啡","探店","打卡","下午茶","周末"],answer:"周末最期待的就是探新开的咖啡店！成都好店太多了，一周去2-3家。一杯手冲三四十加块蛋糕六七十，一个月探店大概花500-800。花的不只是咖啡钱更是美好的周末下午。最近在学拉花。"},
+{keywords:["存钱","储蓄","理财","预算","工资","消费观"],answer:"月入18k在成都生活挺舒服的，每月固定存5000到理财，剩下的花完也不太焦虑。30岁了既要有安全感也要享受当下。健身和猫是雷打不动的预算，包包和探店根据当月剩余灵活调整。"}],
+fallback:"这个问题我挺有感触的。30岁是一个开始思考消费意义的年龄。我的原则是不委屈自己但也不乱花钱。每一笔消费如果让我开心或者变得更好那就是值得的。",
+scenarios:[["如果健身房突然涨价20%，你会续卡还是换一家？","健身涨价测试"],["如果猫生病需要花5000做手术，你会毫不犹豫吗？","宠物医疗测试"],["如果Coach出一个只要1500的限量款，你会冲动下手吗？","轻奢降价测试"]]
+}
+};
+
+var DEFAULT_PERSONA = 'xiaolin';
+var currentPersonaId = DEFAULT_PERSONA;
+var conversation = [];
+var sentimentHistory = [];
+var API_KEY = '';
+var useApi = false;
+
+// ===== THEME =====
+function setTheme(name){
+  document.body.setAttribute('data-theme',name);
+  localStorage.setItem('survey-theme',name);
+  document.querySelectorAll('.theme-dot').forEach(function(d){d.classList.toggle('active',d.getAttribute('data-theme')===name)});
+}
+(function(){var s=localStorage.getItem('survey-theme');if(s)setTheme(s)})();
+
+// ===== API KEY =====
+var apiBackend = 'mock';
+function onApiKeyChange(){
+  API_KEY = document.getElementById('apiKeyInput').value.trim();
+  checkBackend();
+}
+async function checkBackend() {
+  var badge = document.getElementById('apiBadge');
+  // 先检测代理
+  try {
+    var resp = await fetch('http://localhost:3001/api/status');
+    var info = await resp.json();
+    apiBackend = info.backend || 'proxy';
+    useApi = true;
+    badge.textContent = apiBackend === 'ollama' ? 'Ollama 本地' : apiBackend === 'deepseek' ? 'DeepSeek' : 'Claude API';
+    badge.className = 'api-badge on';
+    return;
+  } catch(e) {}
+  // 无代理，检查直连 Key
+  if (API_KEY) {
+    useApi = true;
+    apiBackend = 'direct';
+    badge.textContent = 'API 直连';
+    badge.className = 'api-badge on';
+    return;
+  }
+  // 无 Key 无代理 → Mock
+  useApi = false;
+  apiBackend = 'mock';
+  badge.textContent = 'Mock';
+  badge.className = 'api-badge off';
+}
+// 页面加载后自动检测
+setTimeout(checkBackend, 500);
+
+// ===== PERSONA =====
+function switchPersona(id){
+  currentPersonaId=id;localStorage.setItem('survey-persona',id);
+  renderPersonaBar();renderHero();renderQuickPrompts();renderScenarios();
+}
+function renderPersonaBar(){
+  var bar=document.getElementById('personaBar');
+  var h='<span class="persona-bar-label">Persona</span><div class="persona-cards">';
+  for(var pid in PERSONAS){var p=PERSONAS[pid];var a=pid===currentPersonaId?' active':'';
+    h+='<div class="persona-card-mini'+a+'" onclick="switchPersona(\''+pid+'\')"><span class="persona-card-avatar">'+p.avatar+'</span><span class="persona-card-name">'+p.name+'</span></div>';}
+  h+='</div>';bar.innerHTML=h;
+}
+function renderHero(){
+  var p=PERSONAS[currentPersonaId];
+  document.getElementById('heroAvatar').innerHTML=p.avatar;
+  document.getElementById('heroName').textContent=p.name;
+  document.getElementById('heroMeta').innerHTML='<span>'+p.age+'</span><span class="sep">|</span><span>'+p.city+'</span><span class="sep">|</span><span>'+p.job+'</span>';
+  var sh='';p.stats.forEach(function(s){sh+='<div class="stat-item"><div class="stat-value">'+s.value+'</div><div class="stat-label">'+s.label+'</div></div>'});document.getElementById('heroStats').innerHTML=sh;
+  var th='';p.tags.forEach(function(t){th+='<span class="tag">'+t+'</span>'});document.getElementById('heroTags').innerHTML=th;
+}
+function renderQuickPrompts(){
+  var p=PERSONAS[currentPersonaId];var h='';
+  p.quick_prompts.forEach(function(qp){h+='<span class="chip" onclick="setQuestion(\''+qp[0].replace(/'/g,"\\'")+'\')">'+qp[1]+'</span>'});
+  document.getElementById('quickChips').innerHTML=h;
+}
+function renderScenarios(){
+  var p=PERSONAS[currentPersonaId];
+  var s=p.scenarios||[];var section=document.getElementById('scenarioSection');
+  if(!s.length){section.style.display='none';return}
+  section.style.display='block';
+  var em=['🔮','💡','⚡','🎯'];var h='';
+  s.forEach(function(sc,i){h+='<div class="scenario-card" onclick="setQuestion(\''+sc[0].replace(/'/g,"\\'")+'\');submitQuestion()"><span class="sc-emoji">'+(em[i]||'❓')+'</span> '+sc[0]+'</div>'});
+  document.getElementById('scenarioGrid').innerHTML=h;
+}
+
+// ===== SENTIMENT CLASSIFIER =====
+var POS_WORDS=["喜欢","好用","推荐","值得","满意","划算","实惠","方便","开心","舒服","不错","好 ","爱 ","便宜","超值","棒","囤","回购","种草","必买","值了","绝了","性价比高","最爱","必要","重要","愿意","花得值","提升","享受"];
+var NEG_WORDS=["贵","差","坑","后悔","不好","不行","失望","浪费","太贵","不值","踩雷","垃圾","骗","心疼","下不去手","买不起","消费不起","不划算","不推荐","踩坑","智商税","割韭菜","不好用","烂","差评"];
+function classifySentiment(text){
+  var pos=0,neg=0;POS_WORDS.forEach(function(w){if(text.indexOf(w)>=0)pos++});NEG_WORDS.forEach(function(w){if(text.indexOf(w)>=0)neg++});
+  if(pos>neg+1)return'种草';if(neg>pos+1)return'吐槽';return'中立';
+}
+
+// ===== MOCK ANSWER =====
+function mockAnswer(question,personaId){
+  var p=PERSONAS[personaId]||PERSONAS[DEFAULT_PERSONA];var q=question.toLowerCase();var answer=p.fallback;
+  for(var i=0;i<(p.mock||[]).length;i++){for(var j=0;j<p.mock[i].keywords.length;j++){if(q.indexOf(p.mock[i].keywords[j].toLowerCase())>=0){answer=p.mock[i].answer;break}}if(answer!==p.fallback)break}
+  var sentiment=classifySentiment(answer);
+  var followUps=[];
+  (p.quick_prompts||[]).forEach(function(qp){if(qp[0]!==question)followUps.push({text:qp[0],label:qp[1]})});
+  return{answer:answer,sentiment:sentiment,follow_ups:followUps.slice(0,3)};
+}
+
+// ===== API CALL (proxy auto-detects backend) =====
+var API_BASE = 'http://localhost:3001/api/chat';
+async function apiAnswer(question,personaId){
+  var p=PERSONAS[personaId]||PERSONAS[DEFAULT_PERSONA];
+  var prompt=p.system_prompt+'\n\n请在回答后附加：[情感]种草/中立/吐槽（三选一）\n[追问1]一个相关的追问\n[追问2]另一个相关的追问';
+  var body={model:'claude-sonnet-4-6',max_tokens:500,temperature:0.8,system:prompt,
+    messages:[{role:'user',content:'调研问题：'+question+'\n\n请以这个消费者的身份，用第一人称自然回答。'}]};
+
+  // 先尝试代理
+  var resp=await fetch(API_BASE,{method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)});
+  if(!resp.ok) throw new Error('Proxy error: '+resp.status);
+  var data=await resp.json();
+
+  // 兼容多种响应格式
+  var raw;
+  if(data.content) raw = data.content[0].text;           // Anthropic 格式
+  else if(data.response) raw = data.response;             // Ollama 格式
+  else if(data.choices) raw = data.choices[0].message.content; // OpenAI/DeepSeek 格式
+  else throw new Error('Unknown response format');
+  var raw=data.content[0].text;
+  var sentiment='中立',followUps=[],answer=raw;
+  raw.split('\n').forEach(function(line){line=line.trim();
+    if(line.startsWith('[情感]')||line.startsWith('情感：')){var s=line.replace('[情感]','').replace('情感：','').trim();if(s.indexOf('种草')>=0)sentiment='种草';else if(s.indexOf('吐槽')>=0)sentiment='吐槽'}
+    else if(line.startsWith('[追问1]')||line.startsWith('1.')){var fu=line.split(']')[1]||'';if(fu.trim())followUps.push({text:fu.trim(),label:fu.trim()})}
+    else if(line.startsWith('[追问2]')||line.startsWith('2.')){var fu=line.split(']')[1]||'';if(fu.trim())followUps.push({text:fu.trim(),label:fu.trim()})}
+  });
+  var clean=raw.split('\n').filter(function(l){var t=l.trim();return!t.startsWith('[情感]')&&!t.startsWith('情感：')&&!t.startsWith('[追问')&&!t.startsWith('1.')&&!t.startsWith('2.')}).join('\n').trim();
+  if(!followUps.length){var p=PERSONAS[personaId]||PERSONAS[DEFAULT_PERSONA];(p.quick_prompts||[]).forEach(function(qp){if(qp[0]!==question)followUps.push({text:qp[0],label:qp[1]})});followUps=followUps.slice(0,3)}
+  return{answer:clean||raw,sentiment:sentiment,follow_ups:followUps};
+}
+
+// ===== CONVERSATION =====
+function renderConversation(){
+  var thread=document.getElementById('convThread'),clearBtn=document.getElementById('btnClear');
+  if(!conversation.length){thread.innerHTML='';clearBtn.style.display='none';return}
+  clearBtn.style.display='inline-block';var h='';
+  conversation.forEach(function(pair){
+    h+='<div class="msg-pair"><div class="msg-q">'+esc(pair.q)+'</div><div class="msg-a">'+esc(pair.a);
+    h+='<div class="sentiment-badge s-'+pair.sentiment+'">'+(pair.sentiment==='种草'?'😊 ':pair.sentiment==='吐槽'?'😠 ':'😐 ')+pair.sentiment+'</div>';
+    if(pair.follow_ups&&pair.follow_ups.length){
+      h+='<div class="fu-section"><div class="fu-label">Smart Follow-up</div><div class="fu-chips">';
+      pair.follow_ups.forEach(function(fu){var label=fu.label||fu.text||(Array.isArray(fu)?fu[1]:'')||fu||'',text=fu.text||(Array.isArray(fu)?fu[0]:'')||fu||'';if(typeof text==='string'&&text)h+='<span class="fu-chip" onclick="setQuestion(\''+text.replace(/'/g,"\\'")+'\');submitQuestion()">'+label+'</span>'});
+      h+='</div></div>';
+    }
+    h+='</div></div>';
+  });
+  thread.innerHTML=h;thread.scrollTop=thread.scrollHeight;
+}
+function renderTracker(){
+  var card=document.getElementById('trackerCard'),bar=document.getElementById('trackerBar'),ce=document.getElementById('trackerCount');
+  if(!sentimentHistory.length){card.style.display='none';return}card.style.display='flex';
+  var pos=0,neu=0,neg=0;sentimentHistory.forEach(function(s){if(s==='种草')pos++;else if(s==='吐槽')neg++;else neu++});
+  var t=sentimentHistory.length,pPct=Math.round(pos/t*100),nPct=Math.round(neu/t*100),gPct=100-pPct-nPct;
+  bar.innerHTML='<div class="tracker-seg pos" style="width:'+pPct+'%"></div><div class="tracker-seg neu" style="width:'+nPct+'%"></div><div class="tracker-seg neg" style="width:'+gPct+'%"></div>';
+  ce.textContent=t+' answers · '+pPct+'% 😊 '+nPct+'% 😐 '+gPct+'% 😠';
+}
+function clearConversation(){conversation=[];sentimentHistory=[];renderConversation();renderTracker()}
+function esc(str){var d=document.createElement('div');d.textContent=str;return d.innerHTML}
+
+// ===== SURVEY =====
+var questionInput=document.getElementById('question'),submitBtn=document.getElementById('submitBtn'),btnLabel=document.getElementById('btnLabel'),loading=false;
+window.setQuestion=function(text){questionInput.value=text;questionInput.focus()};
+questionInput.addEventListener('keydown',function(e){if(e.key==='Enter'&&!loading)submitQuestion()});
+
+async function submitQuestion(){
+  var question=questionInput.value.trim();
+  if(!question){questionInput.classList.add('error');setTimeout(function(){questionInput.classList.remove('error')},1500);return}
+  if(loading)return;
+  loading=true;submitBtn.disabled=true;btnLabel.textContent='生成中...';
+  try{
+    var result=useApi?await apiAnswer(question,currentPersonaId):mockAnswer(question,currentPersonaId);
+    conversation.push({q:question,a:result.answer,sentiment:result.sentiment,follow_ups:result.follow_ups});
+    sentimentHistory.push(result.sentiment);questionInput.value='';
+  }catch(e){
+    conversation.push({q:question,a:'请求失败: '+e.message,sentiment:'中立',follow_ups:[]});sentimentHistory.push('中立');
+  }
+  renderConversation();renderTracker();loading=false;submitBtn.disabled=false;btnLabel.textContent='提交调研';
+}
+
+// ===== INIT =====
+(function(){
+  var sp=localStorage.getItem('survey-persona');if(PERSONAS[sp])currentPersonaId=sp;
+  renderPersonaBar();renderHero();renderQuickPrompts();renderScenarios();renderConversation();renderTracker();
+})();
+</script>
+</body>
+</html>
